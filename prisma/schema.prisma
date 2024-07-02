@@ -4,6 +4,11 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// Commands to run:
+// npx prisma generate
+// npx prisma db push
+// npx prisma migrate reset
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -35,6 +40,11 @@ model Account {
   @@map("accounts")
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
+
 model User {
   id            String    @id @default(cuid())
   firstname     String?
@@ -43,6 +53,7 @@ model User {
   emailVerified DateTime? @map("email_verified")
   image         String?
   password      String?
+  role          UserRole  @default(USER)
   accounts      Account[]
 
   @@map("users")
