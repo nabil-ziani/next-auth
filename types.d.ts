@@ -6,7 +6,7 @@ declare module "next-auth" {
      * or the second parameter of the `session` callback, when using a database.
      */
     interface User {
-
+        
     }
     /**
      * The shape of the account object returned in the OAuth providers' `account` callback,
@@ -19,7 +19,10 @@ declare module "next-auth" {
      */
     interface Session {
         user: {
-            role: "ADMIN" | "USER"
+            firstname: string,
+            lastname: string,
+            role: "ADMIN" | "USER",
+            isTwoFactorEnabled: boolean
         } & DefaultSession["user"]
     }
 }

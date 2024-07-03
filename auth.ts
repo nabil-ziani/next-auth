@@ -28,7 +28,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
             // Prevent signin without email verification
             if (!existingUser?.emailVerified) {
-                console.log(existingUser)
                 return false
             }
 
@@ -54,6 +53,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 session.user.role = token.role
             }
 
+            if (token.firstname && session.user) {
+                session.user.firstname = token.firstname as string
+            }
+
+            if (token.lastname && session.user) {
+                session.user.lastname = token.lastname as string
+            }
+
+            if (session.user) {
+                session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean
+            }
+
             return session
         },
         async jwt({ token }) {
@@ -63,7 +74,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
             if (!existingUser) return token
 
+            token.firstname = existingUser.firstname
+            token.lastname = existingUser.lastname
             token.role = existingUser.role
+            token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled
 
             return token
         }
