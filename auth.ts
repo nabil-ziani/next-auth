@@ -5,6 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { db } from "./lib/db"
 import { getUserById } from "./data/user"
 import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation"
+import { getAccountByUserId } from "./data/account"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     pages: {
@@ -61,8 +62,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 session.user.lastname = token.lastname as string
             }
 
+            if (token.email && session.user) {
+                session.user.email = token.email
+            }
+
             if (session.user) {
                 session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean
+                session.user.isOAuth = token.isOAuth as boolean
             }
 
             return session
@@ -71,11 +77,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (!token.sub) return token
 
             const existingUser = await getUserById(token.sub)
-
             if (!existingUser) return token
 
+            const existingAccount = await getAccountByUserId(existingUser.id)
+
+            token.isOAuth = !!existingAccount
             token.firstname = existingUser.firstname
             token.lastname = existingUser.lastname
+            token.email = existingUser.email
             token.role = existingUser.role
             token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled
 
